@@ -15,6 +15,7 @@ export default function Login() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
+        credentials: 'include', // 👈 Add this
       });
 
       const data = await response.json();
@@ -29,10 +30,10 @@ export default function Login() {
         // Navigate by user type (case-insensitive)
         switch (data.userType.toLowerCase()) {
           case 'admin':
-            navigate('/ManageUsers');
+            navigate('/admin/manage-users');
             break;
           case 'worker':
-            navigate('/WorkerTasksAssigned');
+            navigate('/worker/tasks-assigned');
             break;
           case 'customer':
             navigate('/Tasks');

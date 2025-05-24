@@ -4,7 +4,7 @@ const About = () => {
   return (
     <div className="bg-gradient-to-br from-blue-50 via-sky-100 to-indigo-100 min-h-screen text-gray-800">
       {/* Header */}
-      <section className="bg-gradient-to-r from-sky-600 to-blue-700 text-white py-14 px-6 text-center shadow">
+      <section className="bg-gradient-to-r from-sky-500 to-teal-700 text-white py-14 px-6 text-center shadow">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Who We Are</h1>
         <p className="text-lg max-w-3xl mx-auto">
           Helping neighbors help each other — Find trusted local workers for everyday tasks.

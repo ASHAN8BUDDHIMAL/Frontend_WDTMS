@@ -6,7 +6,7 @@ const Navbar = () => {
     <nav className="bg-white shadow-md px-6 py-4">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo or Brand */}
-        <div className="text-2xl font-bold text-blue-700">
+        <div className="text-2xl font-bold text-blue-600">
           <Link to="/">findWorker</Link>
         </div>
 
@@ -27,7 +27,7 @@ const Navbar = () => {
         <div className="flex space-x-4">
           <Link
             to="/registration"
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+            className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-300 transition"
           >
             Sign Up
           </Link>

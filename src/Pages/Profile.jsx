@@ -1,185 +1,156 @@
 import React, { useState, useEffect } from "react";
 
 const UserProfile = () => {
-  const [editing, setEditing] = useState(false);
-  const [profilePhoto, setProfilePhoto] = useState(null);
-  const [previewPhoto, setPreviewPhoto] = useState(null);
   const [userData, setUserData] = useState({
-    id: "",
-    fullName: "",
+    id: null,
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
     address: "",
+    district: "",
+    city: "",
+    postalCode: "",
+    userType: "",
   });
 
-  // Get email from sessionStorage and fetch user
+  const [profilePicUrl, setProfilePicUrl] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+
   useEffect(() => {
-    const email = sessionStorage.getItem("email");
-    if (email) {
-      fetch(`http://localhost:8080/api/users/email/${email}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setUserData(data);
-        })
-        .catch((err) => console.error("Error loading user:", err));
-    }
+    fetch("http://localhost:8080/api/profile", {
+      method: "GET",
+      credentials: "include",
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("User not logged in.");
+        return res.json();
+      })
+      .then((data) => {
+        setUserData(data);
+        fetchProfilePicture(data.email);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Please log in to view your profile.");
+      });
   }, []);
 
-  const handleInputChange = (e) => {
-    setUserData({ ...userData, [e.target.name]: e.target.value });
+  const fetchProfilePicture = (email) => {
+    fetch(`http://localhost:8080/api/profilePic?email=${email}`)
+      .then((res) => {
+        if (res.ok) return res.blob();
+        throw new Error("No profile picture found.");
+      })
+      .then((imageBlob) => {
+        const imageUrl = URL.createObjectURL(imageBlob);
+        setProfilePicUrl(imageUrl);
+      })
+      .catch(() => setProfilePicUrl(null));
   };
 
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    setProfilePhoto(file);
-    setPreviewPhoto(URL.createObjectURL(file));
+  const handleFileChange = (e) => setSelectedFile(e.target.files[0]);
+
+  const handleUpload = () => {
+    if (!selectedFile || !userData.id) return;
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    fetch(`http://localhost:8080/api/${userData.id}/uploadProfilePic`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Upload failed");
+        alert("Profile picture uploaded!");
+        fetchProfilePicture(userData.email);
+      })
+      .catch(() => alert("Error uploading image"));
   };
-
-  const handleSave = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("fullName", userData.fullName);
-      formData.append("email", userData.email);
-      formData.append("phone", userData.phone);
-      formData.append("address", userData.address);
-      if (profilePhoto) {
-        formData.append("photo", profilePhoto); // backend must handle this
-      }
-
-      const response = await fetch(`http://localhost:8080/api/users/${userData.id}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      if (response.ok) {
-        alert("Profile updated successfully!");
-        setEditing(false);
-        setProfilePhoto(null);
-      } else {
-        alert("Failed to update profile");
-      }
-    } catch (err) {
-      console.error("Save failed:", err);
-    }
-  };
-
-  const handleChangePassword = () => {
-    // Redirect or open modal for changing password
-    alert("Redirect to change password page (implement separately)");
-  };
+ 
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4 sm:px-8">
-      <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-6">
-        <h1 className="text-3xl font-bold text-blue-700 mb-6 text-center">My Profile</h1>
+  <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-6 pt-24">
+    <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl p-8">
+      <div className="rounded-2xl shadow-md overflow-hidden border border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-3">
+           {/* Profile Picture */}
+            <div className="bg-teal-600 text-white flex flex-col items-center justify-center p-6 rounded-bl-xl">
+              <div className="mb-4">
+                {selectedFile ? (
+                  <img
+                    src={URL.createObjectURL(selectedFile)}
+                    alt="Preview"
+                    className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg transition duration-300"
+                  />
+                ) : profilePicUrl ? (
+                  <img
+                    src={profilePicUrl}
+                    alt="Profile"
+                    className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg transition duration-300"
+                  />
+                ) : (
+                  <div className="w-36 h-36 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-lg font-semibold shadow-lg">
+                    No Image
+                  </div>
+                )}
+              </div>
 
-        <div className="flex flex-col items-center">
-          <div className="relative">
-            <img
-              src={
-                previewPhoto ||
-                userData.photoUrl ||
-                "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
-              }
-              alt="Profile"
-              className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
-            />
-            {editing && (
-              <label className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-1 cursor-pointer hover:bg-blue-700">
-                <input type="file" className="hidden" onChange={handlePhotoChange} />
-                ✎
+              <label className="cursor-pointer text-sm font-semibold bg-white text-green-600 px-4 py-2 rounded-full shadow-sm hover:bg-gray-100 transition">
+               Edit Profile
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </label>
-            )}
-          </div>
-        </div>
 
-        <div className="mt-8 space-y-4">
-          <div>
-            <label className="block text-gray-700 font-semibold">Full Name</label>
-            {editing ? (
-              <input
-                type="text"
-                name="fullName"
-                value={userData.fullName}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded"
-              />
-            ) : (
-              <p className="text-gray-800">{userData.fullName}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-semibold">Email</label>
-            <p className="text-gray-800">{userData.email}</p>
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-semibold">Phone</label>
-            {editing ? (
-              <input
-                type="text"
-                name="phone"
-                value={userData.phone}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded"
-              />
-            ) : (
-              <p className="text-gray-800">{userData.phone}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-semibold">Address</label>
-            {editing ? (
-              <textarea
-                name="address"
-                value={userData.address}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded"
-              />
-            ) : (
-              <p className="text-gray-800">{userData.address}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-6 flex justify-center flex-wrap gap-4">
-          {editing ? (
-            <>
               <button
-                onClick={handleSave}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                onClick={handleUpload}
+                disabled={!selectedFile}
+                className={`mt-3 px-4 py-2 rounded-full text-sm font-semibold transition ${
+                  selectedFile
+                    ? "bg-white text-green-600 hover:bg-gray-100"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
               >
-                Save Changes
+                Update
               </button>
-              <button
-                onClick={() => setEditing(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => setEditing(true)}
-                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-              >
-                Edit Profile
-              </button>
-              <button
-                onClick={handleChangePassword}
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-              >
-                Change Password
-              </button>
-            </>
-          )}
+            </div>
+
+
+            {/* Profile Info */}
+            <div className="col-span-2 p-8 space-y-6">
+              <h2 className="text-3xl font-extrabold text-teal-600 tracking-wide outline-4">My Profile</h2>
+
+              <ProfileField label="Name" value={`${userData.firstName} ${userData.lastName}`} />
+              <ProfileField label="Email" value={userData.email} />
+              <ProfileField label="Phone" value={userData.phone} />
+              <ProfileField label="User Type" value={userData.userType} />
+
+              <div>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Address</h3>
+                <p className="text-gray-700 mt-1">
+                  {userData.address}<br />
+                  {userData.city}, {userData.district}<br />
+                  {userData.postalCode}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
+const ProfileField = ({ label, value }) => (
+  <div>
+    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">{label}</h3>
+    <p className="text-gray-700 mt-1">{value || "—"}</p>
+  </div>
+);
 
 export default UserProfile;

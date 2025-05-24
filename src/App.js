@@ -63,7 +63,7 @@ function App() {
          <Route path="/worker/tasks-assigned" element={<WorkerTasksAssigned />} />
          <Route path="/worker/completed-tasks" element={<WorkerCompletedTasks />} />
          <Route path="/worker/chat" element={<WorkerChat />} />
-         <Route path="/worker/profile" element={<WorkerProfile />} />
+         <Route path="/worker/worker-profile" element={<WorkerProfile />} />
         </Route>
       </Routes>
     </Router>

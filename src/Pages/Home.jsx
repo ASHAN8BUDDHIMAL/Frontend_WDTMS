@@ -32,7 +32,7 @@ const Home = () => {
   return (
     <div className="bg-slate-50 min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-sky-600 to-indigo-700 text-white py-16 px-6 text-center">
+      <section className="bg-gradient-to-r from-sky-500 to-teal-700 text-white py-16 px-6 text-center">
         <h1 className="text-5xl font-bold mb-4">Find Trusted Local Workers</h1>
         <p className="text-lg mb-6">Quickly connect with skilled professionals near you</p>
         <Link
