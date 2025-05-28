@@ -26,6 +26,7 @@ import WorkerTasksAssigned from "./Pages/WorkerTasksAssigned";
 import WorkerChat from "./Pages/WorkerChat";
 import WorkerProfile from "./Pages/WorkerProfile";
 import WorkerCompletedTasks from "./Pages/WorkerCompletedTasks";
+import AvailabilityCalendar from "./Pages/AvailabilityCalendar";
 
 
 function App() {
@@ -64,6 +65,7 @@ function App() {
          <Route path="/worker/completed-tasks" element={<WorkerCompletedTasks />} />
          <Route path="/worker/chat" element={<WorkerChat />} />
          <Route path="/worker/worker-profile" element={<WorkerProfile />} />
+          <Route path="/worker/availability-calendar" element={<AvailabilityCalendar />} />
         </Route>
       </Routes>
     </Router>

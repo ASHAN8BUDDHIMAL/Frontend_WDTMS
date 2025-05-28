@@ -1,274 +1,167 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from 'react';
+import UserProfile from '../Components/UserProfile';
+import Location from '../Components/Location';
 
-const UserProfile = () => {
-  // userData holds basic profile info
-  const [userData, setUserData] = useState({
-    id: null,
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    address: "",
-    district: "",
-    city: "",
-    postalCode: "",
-    userType: "",
+const WorkerProfile = () => {
+  const [worker, setWorker] = useState({
+    skills: '',
+    workCity: '',
+    rating: 0
   });
 
-  // workerData holds the worker-specific details
-  const [workerData, setWorkerData] = useState({
-    skills: "",
-    city: "",
-    rating: "",
-  });
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const [profilePicUrl, setProfilePicUrl] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [isEditingWorker, setIsEditingWorker] = useState(false);
-  const [isWorkerExist, setIsWorkerExist] = useState(false);
-
-  // On mount: fetch profile, picture, and worker details if userType === 'worker'
+  // Fetch worker data from backend
   useEffect(() => {
-    fetch("http://localhost:8080/api/profile", {
-      method: "GET",
-      credentials: "include",
+    fetch('http://localhost:8080/api/worker', {
+      credentials: 'include',
     })
-      .then((res) => {
-        if (!res.ok) throw new Error("Not logged in");
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch worker');
         return res.json();
       })
-      .then((data) => {
-        setUserData(data);
-        fetchProfilePicture(data.email);
-        if (data.userType === "worker") {
-          fetchWorkerInfo();
-        }
+      .then(data => {
+        setWorker({
+          skills: data.skills || '',
+          workCity: data.workCity || '',
+          rating: data.rating || 0
+        });
+        setLoading(false);
       })
-      .catch((err) => {
+      .catch(err => {
         console.error(err);
-        alert("Please log in to view your profile.");
+        setLoading(false);
       });
   }, []);
 
-  // Fetch profile picture blob and convert to URL
-  const fetchProfilePicture = (email) => {
-    fetch(`http://localhost:8080/api/profilePic?email=${email}`, {
-      credentials: "include",
-    })
-      .then((res) => {
-        if (res.ok) return res.blob();
-        throw new Error("No profile picture");
-      })
-      .then((blob) => {
-        setProfilePicUrl(URL.createObjectURL(blob));
-      })
-      .catch(() => setProfilePicUrl(null));
+  // Handle input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setWorker(prev => ({ ...prev, [name]: value }));
   };
 
-  // Fetch worker info from /api/worker
-  const fetchWorkerInfo = () => {
-    fetch("http://localhost:8080/api/worker", {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((res) => {
-        if (res.status === 404) {
-          setIsWorkerExist(false);
-          return null;
-        }
-        if (!res.ok) throw new Error("Worker info not found");
-        return res.json();
-      })
-      .then((data) => {
-        if (data) {
-          setWorkerData({
-            skills: data.skills || "",
-            city: data.workCity || "",
-            rating: data.rating != null ? data.rating.toString() : "",
-          });
-          setIsWorkerExist(true);
-        }
-      })
-      .catch(console.error);
+  // Save updates
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const res = await fetch('http://localhost:8080/api/worker', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        skills: worker.skills,
+        workCity: worker.workCity,
+        rating: Number(worker.rating)
+      }),
+    });
+
+    if (res.ok) {
+      alert('Worker details updated successfully');
+      setIsEditing(false);
+    } else {
+      const errText = await res.text();
+      alert('Failed to update worker details: ' + errText);
+    }
   };
 
-  // Handle file selection
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-  };
-
-  // Upload profile picture
-  const handleUpload = () => {
-    if (!selectedFile) return;
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
-    fetch(`http://localhost:8080/api/${userData.id}/uploadProfilePic`, {
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Upload failed");
-        alert("Profile picture uploaded!");
-        fetchProfilePicture(userData.email);
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Error uploading image");
-      });
-  };
-
-  // Create or update worker info
-  const handleWorkerUpdate = () => {
-    const payload = {
-      skills: workerData.skills,
-      workCity: workerData.city,           // must match your entity
-      rating: parseFloat(workerData.rating),
-    };
-
-    fetch("http://localhost:8080/api/worker", {
-      method: isWorkerExist ? "PUT" : "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    })
-      .then((res) => {
-        if (!res.ok) return res.text().then((txt) => { throw new Error(txt || res.status); });
-        alert("Worker info saved!");
-        setIsEditingWorker(false);
-        setIsWorkerExist(true);
-      })
-      .catch((err) => {
-        console.error("Save worker error:", err);
-        alert("Error saving worker info: " + err.message);
-      });
-  };
+  if (loading) {
+    return <p className="text-center mt-6">Loading worker details...</p>;
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-6 pt-24">
-      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl p-8">
-        <div className="grid grid-cols-1 md:grid-cols-3">
-          {/* Profile Picture Panel */}
-          <div className="bg-teal-600 text-white flex flex-col items-center justify-center p-6 rounded-bl-xl">
-            <div className="mb-4">
-              {selectedFile ? (
-                <img
-                  src={URL.createObjectURL(selectedFile)}
-                  alt="Preview"
-                  className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg"
-                />
-              ) : profilePicUrl ? (
-                <img
-                  src={profilePicUrl}
-                  alt="Profile"
-                  className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg"
-                />
-              ) : (
-                <div className="w-36 h-36 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-lg font-semibold shadow-lg">
-                  No Image
-                </div>
-              )}
-            </div>
-            <label className="cursor-pointer text-sm font-semibold bg-white text-green-600 px-4 py-2 rounded-full shadow-sm hover:bg-gray-100">
-              Change Picture
-              <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-            </label>
-            <button
-              onClick={handleUpload}
-              disabled={!selectedFile}
-              className={`mt-3 px-4 py-2 rounded-full text-sm font-semibold ${
-                selectedFile
-                  ? "bg-white text-green-600 hover:bg-gray-100"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-            >
-              Upload
-            </button>
-          </div>
+        <div className="min-h-screen bg-gray-200">
+          <div className="max-w-4xl mx-auto p-4  ">
+            <div className="bg-white shadow rounded p-6 space-y-8 ">
+              {/* User Profile and Worker Details together */}
+              <UserProfile />
+              <Location/>
+              <div>
+                <h2 className="text-2xl font-bold mb-6">Editable Details</h2>
 
-          {/* Profile & Worker Details */}
-          <div className="col-span-2 p-8 space-y-6">
-            <h2 className="text-3xl font-extrabold text-teal-600">My Profile</h2>
-            <ProfileField label="Name" value={`${userData.firstName} ${userData.lastName}`} />
-            <ProfileField label="Email" value={userData.email} />
-            <ProfileField label="Phone" value={userData.phone} />
-            <ProfileField label="User Type" value={userData.userType} />
-            <ProfileField
-              label="Address"
-              value={`${userData.address}, ${userData.city}, ${userData.district} ${userData.postalCode}`}
-            />
+                {!isEditing ? (
+                  <div className="space-y-3">
+                    <p><strong>Skills:</strong> {worker.skills || 'N/A'}</p>
+                    <p><strong>City:</strong> {worker.workCity || 'N/A'}</p>
+                    <p><strong>Rating:</strong> {worker.rating ?? 'N/A'}</p>
 
-            {userData.userType === "worker" && (
-              <div className="mt-6 border-t pt-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-xl font-bold text-teal-600">Worker Details</h3>
-                  <button
-                    onClick={() => setIsEditingWorker(!isEditingWorker)}
-                    className="text-sm font-medium text-blue-600 hover:underline"
-                  >
-                    {isEditingWorker ? "Cancel" : isWorkerExist ? "Edit" : "Add"}
-                  </button>
-                </div>
-
-                {isEditingWorker ? (
-                  <div className="mt-4 space-y-4">
-                    <InputField
-                      label="Skills"
-                      value={workerData.skills}
-                      onChange={(val) => setWorkerData({ ...workerData, skills: val })}
-                    />
-                    <InputField
-                      label="City"
-                      value={workerData.city}
-                      onChange={(val) => setWorkerData({ ...workerData, city: val })}
-                    />
-                    <InputField
-                      label="Rating"
-                      type="number"
-                      value={workerData.rating}
-                      onChange={(val) => setWorkerData({ ...workerData, rating: val })}
-                    />
                     <button
-                      onClick={handleWorkerUpdate}
-                      className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700"
+                      onClick={() => setIsEditing(true)}
+                      className="mt-6 px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                     >
-                      Save
+                      Edit Details
                     </button>
                   </div>
                 ) : (
-                  <div className="mt-4">
-                    <ProfileField label="Skills" value={workerData.skills} />
-                    <ProfileField label="City" value={workerData.city} />
-                    <ProfileField label="Rating" value={workerData.rating} />
-                  </div>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                      <label className="block font-medium mb-1">Skills</label>
+                      <input
+                        type="text"
+                        name="skills"
+                        value={worker.skills}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded px-3 py-2"
+                        placeholder="e.g. Plumbing, Electrical"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-medium mb-1">Work City</label>
+                      <input
+                        type="text"
+                        name="workCity"
+                        value={worker.workCity}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded px-3 py-2"
+                        placeholder="Enter city"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-medium mb-1">Rating</label>
+                      <input
+                        type="number"
+                        name="rating"
+                        value={worker.rating}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded px-3 py-2"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        placeholder="0 to 5"
+                      />
+                    </div>
+
+                    <div className="flex space-x-4 mt-4">
+                      <button
+                        type="submit"
+                        className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsEditing(false)}
+                        className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    
+                  </form>
                 )}
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+                       
       </div>
-    </div>
+      
+   </div>
   );
 };
 
-const ProfileField = ({ label, value }) => (
-  <div>
-    <h3 className="text-sm font-semibold text-gray-500 uppercase">{label}</h3>
-    <p className="text-gray-700 mt-1">{value || "—"}</p>
-  </div>
-);
-
-const InputField = ({ label, value, onChange, type = "text" }) => (
-  <div>
-    <label className="block text-sm font-medium text-gray-700">{label}</label>
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-    />
-  </div>
-);
-
-export default UserProfile;
+export default WorkerProfile;

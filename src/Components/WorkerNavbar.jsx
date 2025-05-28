@@ -23,6 +23,7 @@ const WorkerNavbar = () => {
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-6">
             <Link to="/worker/tasks-assigned" className="nav-link">Tasks</Link>
+            <Link to="/worker/availability-calendar" className="nav-link">Availability</Link>
             <Link to="/worker/completed-tasks" className="nav-link">Completed</Link>
             <Link to="/worker/chat" className="nav-link flex items-center gap-1">
               <MessageSquare className="w-4 h-4" /> Chat
