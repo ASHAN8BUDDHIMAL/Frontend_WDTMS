@@ -81,7 +81,7 @@ const Profile = () => {
   const fullAddress = `${user.address}, ${user.city}, ${user.district}, ${user.postalCode}`;
 
   return (
-    <div className="max-w-10xl mx-auto p-6 mt-10">
+    <div className="max-w-10xl mx-auto p-6 mt-10 space-y-5 border border-blue-200 rounded-xl p-5 bg-white">
       <div className="flex flex-col md:flex-row items-center gap-8">
         <div className="text-center">
           {profilePicUrl ? (
