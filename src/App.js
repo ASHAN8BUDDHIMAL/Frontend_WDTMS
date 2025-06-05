@@ -11,10 +11,11 @@ import Registration from "./Pages/Registration";
 import Login from "./Pages/Login";
 
 import Tasks from "./Pages/Tasks";
-import Workers from "./Pages/Workers";
+import FindWorkers from "./Pages/FindWorkers";
 import Chat from "./Pages/Chat";
 import Profile from "./Pages/Profile";
 import CompletedTasks from "./Pages/CompletedTasks";
+import Newtasks from "./Pages/Newtasks";
 
 import ManageUsers from "./Pages/ManageUsers";
 import ManageTasks from "./Pages/ManageTasks";
@@ -45,10 +46,12 @@ function App() {
         {/* Dashboard pages */}
         <Route element={<DashboardLayout />}>
           <Route path="/tasks" element={<Tasks />} />
-          <Route path="/workers" element={<Workers />} />
+          <Route path="/find-workers" element={<FindWorkers />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/completed-tasks" element={<CompletedTasks />} />
+          <Route path="/new-tasks" element={<Newtasks />} />
+
         </Route>
 
          {/* Admin Dashboard Routes */}

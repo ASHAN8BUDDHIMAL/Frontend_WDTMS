@@ -23,7 +23,7 @@ const UserNavbar = () => {
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-6">
             <Link to="/tasks" className="nav-link">Tasks</Link>
-            <Link to="/workers" className="nav-link">Workers</Link>
+            <Link to="/find-workers" className="nav-link">Find Workers</Link>
             <Link to="/chat" className="nav-link">Chat</Link>
             <Link to="/completed-tasks" className="nav-link">Completed</Link>
           </div>
@@ -58,7 +58,7 @@ const UserNavbar = () => {
       {menuOpen && (
         <div className="md:hidden px-4 pb-4 bg-white shadow-md space-y-2">
           <Link to="/tasks" className="block nav-link">Tasks</Link>
-          <Link to="/workers" className="block nav-link">Workers</Link>
+          <Link to="/find-workers" className="block nav-link">Find Workers</Link>
           <Link to="/chat" className="block nav-link">Chat</Link>
           <Link to="/completed-tasks" className="block nav-link">Completed</Link>
           <button onClick={handleLogout} className="w-full text-left text-red-600 hover:underline">Logout</button>
