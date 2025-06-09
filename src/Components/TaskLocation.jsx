@@ -29,7 +29,7 @@ const WorkerLocationMap = () => {
 
   const fetchSavedLocation = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/location/worker', {
+      const response = await fetch('http://localhost:8080/api/location/task', {
         credentials: 'include',
       });
       if (!response.ok) return;
@@ -130,7 +130,7 @@ const WorkerLocationMap = () => {
     if (!latLng) return alert('No location selected');
 
     try {
-      const res = await fetch('http://localhost:8080/api/location/worker', {
+      const res = await fetch('http://localhost:8080/api/location/task', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -143,7 +143,7 @@ const WorkerLocationMap = () => {
 
       if (!res.ok) throw new Error('Save failed');
       alert('Location saved!');
-      
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert('Error saving location');
@@ -152,7 +152,7 @@ const WorkerLocationMap = () => {
 
   return (
     <div className="space-y-5 border border-blue-200 rounded-xl p-5 bg-white">
-      <h2 className="text-xl font-semibold mb-3">Save your location</h2>
+      <h2 className="text-xl font-semibold mb-3">Now, select the location of task</h2>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-3">
         <input

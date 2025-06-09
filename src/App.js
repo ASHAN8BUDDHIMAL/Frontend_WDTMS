@@ -16,6 +16,7 @@ import Chat from "./Pages/Chat";
 import Profile from "./Pages/Profile";
 import CompletedTasks from "./Pages/CompletedTasks";
 import Newtasks from "./Pages/Newtasks";
+import ViewProfile from "./Pages/ViewProfile";
 
 import ManageUsers from "./Pages/ManageUsers";
 import ManageTasks from "./Pages/ManageTasks";
@@ -28,7 +29,7 @@ import WorkerChat from "./Pages/WorkerChat";
 import WorkerProfile from "./Pages/WorkerProfile";
 import WorkerCompletedTasks from "./Pages/WorkerCompletedTasks";
 import AvailabilityCalendar from "./Pages/AvailabilityCalendar";
-
+import ReviewRating from "./Pages/ReviewRating";
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/completed-tasks" element={<CompletedTasks />} />
           <Route path="/new-tasks" element={<Newtasks />} />
+          <Route path="/view-profile/:userId" element={<ViewProfile />} />
 
         </Route>
 
@@ -68,7 +70,8 @@ function App() {
          <Route path="/worker/completed-tasks" element={<WorkerCompletedTasks />} />
          <Route path="/worker/chat" element={<WorkerChat />} />
          <Route path="/worker/worker-profile" element={<WorkerProfile />} />
-          <Route path="/worker/availability-calendar" element={<AvailabilityCalendar />} />
+         <Route path="/worker/availability-calendar" element={<AvailabilityCalendar />} />
+         <Route path="/worker/review-rating" element={<ReviewRating />} />
         </Route>
       </Routes>
     </Router>

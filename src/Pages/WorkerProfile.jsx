@@ -10,24 +10,33 @@ const WorkerProfile = () => {
 
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [workerExists, setWorkerExists] = useState(false);
 
   useEffect(() => {
     fetch('http://localhost:8080/api/worker', {
       credentials: 'include',
     })
       .then(res => {
+        if (res.status === 404) {
+          setWorkerExists(false);
+          setLoading(false);
+          return;
+        }
         if (!res.ok) throw new Error('Failed to fetch worker');
         return res.json();
       })
       .then(data => {
-        setWorker({
-          skills: data.skills || '',
-          chargePerHour: data.chargePerHour || 0,
-        });
+        if (data) {
+          setWorker({
+            skills: data.skills || '',
+            chargePerHour: data.chargePerHour || 0,
+          });
+          setWorkerExists(true);
+        }
         setLoading(false);
       })
       .catch(err => {
-        console.error(err);
+        console.error('Error fetching worker:', err);
         setLoading(false);
       });
   }, []);
@@ -43,8 +52,10 @@ const WorkerProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const method = workerExists ? 'PUT' : 'POST';
+
     const res = await fetch('http://localhost:8080/api/worker', {
-      method: 'PUT',
+      method: method,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -56,7 +67,7 @@ const WorkerProfile = () => {
     });
 
     if (res.ok) {
-      alert('Worker details updated successfully');
+      alert(`Worker details ${workerExists ? 'updated' : 'created'} successfully`);
 
       const updatedRes = await fetch('http://localhost:8080/api/worker', {
         credentials: 'include',
@@ -68,12 +79,13 @@ const WorkerProfile = () => {
           skills: updatedData.skills || '',
           chargePerHour: updatedData.chargePerHour || 0,
         });
+        setWorkerExists(true);
       }
 
       setIsEditing(false);
     } else {
       const errText = await res.text();
-      alert('Failed to update worker details: ' + errText);
+      alert('Failed to save worker details: ' + errText);
     }
   };
 
@@ -82,7 +94,7 @@ const WorkerProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 py-10 ">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 py-10">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white shadow-2xl rounded-2xl p-8 space-y-10">
           <UserProfile />
@@ -94,7 +106,7 @@ const WorkerProfile = () => {
             </h2>
 
             {!isEditing ? (
-              <div className="space-y-4 text-gray-700 ">
+              <div className="space-y-4 text-gray-700">
                 <p>
                   <span className="font-semibold text-blue-700">Skills:</span>{' '}
                   {worker.skills || 'N/A'}
