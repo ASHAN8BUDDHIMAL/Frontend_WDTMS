@@ -22,7 +22,7 @@ export default function Login() {
 
       if (response.ok) {
         // Save to localStorage if needed
-         localStorage.setItem('id', data.userId);//
+        //  localStorage.setItem('id', data.userId);//
         localStorage.setItem('userEmail', data.email);
         localStorage.setItem('userType', data.userType);
 

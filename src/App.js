@@ -68,7 +68,7 @@ function App() {
         <Route element={<WorkerLayout />}>
          <Route path="/worker/tasks-assigned" element={<WorkerTasksAssigned />} />
          <Route path="/worker/completed-tasks" element={<WorkerCompletedTasks />} />
-         <Route path="/worker/chat" element={<WorkerChat />} />
+         <Route path="/worker/worker-chat" element={<WorkerChat />} />
          <Route path="/worker/worker-profile" element={<WorkerProfile />} />
          <Route path="/worker/availability-calendar" element={<AvailabilityCalendar />} />
          <Route path="/worker/review-rating" element={<ReviewRating />} />

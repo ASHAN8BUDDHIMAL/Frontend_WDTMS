@@ -16,28 +16,50 @@ const SaveContact = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const response = await fetch("http://localhost:8080/api/reg", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+  // Email validation (basic format check)
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(formData.email)) {
+    setErrorMessage("Please enter a valid email address.");
+    return;
+  }
 
-      const result = await response.json();
+  // Password validation (minimum 8 characters, at least one uppercase, one lowercase, one number, and one special character)
+  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  if (!passwordPattern.test(formData.password)) {
+    setErrorMessage(
+      "Password must be at least 8 characters long, include uppercase and lowercase letters, a number, and a special character."
+    );
+    return;
+  }
 
-      if (response.ok) {
-        alert(result.message || "Registration successful!");
-        navigate('/login');
-      } else {
-        setErrorMessage(result.message || "Registration failed!");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      setErrorMessage("An error occurred. Please try again.");
+  // Confirm password validation
+  if (formData.password !== formData.confirmPassword) {
+    setErrorMessage("Passwords do not match.");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:8080/api/reg", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert(result.message || "Registration successful!");
+      navigate('/login');
+    } else {
+      setErrorMessage(result.message || "Registration failed!");
     }
-  };
+  } catch (error) {
+    console.error("Error:", error);
+    setErrorMessage("An error occurred. Please try again.");
+  }
+};
 
   return (
     <div
@@ -119,7 +141,7 @@ const SaveContact = () => {
                 <option value="">Select User Type</option>
                 <option value="customer">Customer</option>
                 <option value="worker">Worker</option>
-                <option value="Admin">Admin</option>
+                {/* <option value="Admin">Admin</option> */}
               </select>
             </div>
 

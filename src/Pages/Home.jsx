@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 
 const Home = () => {
   const tasks = [
-    { name: "Plumbing", image: "https://source.unsplash.com/400x300/?plumber" },
-    { name: "Gardening", image: "https://source.unsplash.com/400x300/?gardening" },
-    { name: "Electrician", image: "https://source.unsplash.com/400x300/?electrician" },
+   { name: "Plumbing", image: "/images/Plumbing.jpeg" },
+  { name: "Gardening", image: "/images/Gardening.jpeg" },
+  { name: "Electrician", image: "/images/Electrician.jpeg" },
   ];
 
   const topWorkers = [

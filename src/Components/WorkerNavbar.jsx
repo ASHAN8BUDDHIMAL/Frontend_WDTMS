@@ -26,7 +26,7 @@ const WorkerNavbar = () => {
             <Link to="/worker/availability-calendar" className="nav-link">Availability</Link>
             <Link to="/worker/completed-tasks" className="nav-link">Completed</Link>
             <Link to="/worker/review-rating" className="nav-link">Reviews</Link>
-            <Link to="/worker/chat" className="nav-link flex items-center gap-1">
+            <Link to="/worker/worker-chat" className="nav-link flex items-center gap-1">
               <MessageSquare className="w-4 h-4" /> Chat
             </Link>
           </div>
@@ -64,7 +64,7 @@ const WorkerNavbar = () => {
           <Link to="/worker/completed-tasks" className="block nav-link">Completed</Link>
           {/* <Link to="/worker/availability-calendar" className="block nav-link">Availability</Link> */}
           <Link to="/worker/review-rating" className="block nav-link">Reviews</Link>
-          <Link to="/worker/chat" className="block nav-link flex items-center gap-1">
+          <Link to="/worker/worker-chat" className="block nav-link flex items-center gap-1">
             <MessageSquare className="w-4 h-4" /> Chat
           </Link>
           <Link to="/worker/worker-profile" className="block nav-link">My Profile</Link>

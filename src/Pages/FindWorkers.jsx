@@ -64,56 +64,29 @@ const FindWorker = () => {
   };
 
 const handleSendTask = async (worker) => {
+  const workerId = worker.userId;      // Assuming worker.userId is correct
+  const taskId = selectedTaskId;       // Selected task ID
+
+  if (!taskId || !workerId) {
+    return alert('❌ Missing task or worker ID.');
+  }
+
   try {
-    // const userId = parseInt(localStorage.getItem('userId'), 10);
-    const workerId = worker?.userId;
-    const taskId = selectedTaskId;
-
-    if (!taskId) {
-      alert('❌ Missing task ID (taskId). Please select a task first.');
-      return;
-    }
-
-    if (!workerId) {
-      alert('❌ Missing worker ID (workerId). Please select a valid worker.');
-      return;
-    }
-
-    // if (isNaN(userId)) {
-    //   alert('❌ Missing or invalid user ID (userId). Make sure you are logged in.');
-    //   return;
-    // }
-
-    // 1. Send the task
-    // await axios.post(
-    //   `http://localhost:8080/api/tasks/send-task`,
-    //   null,
-    //   {
-    //     params: { taskId, workerId },
-    //     withCredentials: true,
-    //   }
-    // );
-
-    // 2. Update task status to ASSIGNED
+    // Use PUT (not POST) to match your backend mapping
     await axios.put(
-      `http://localhost:8080/api/task-status/update`,
-      {
-        
-        taskId,
-        workerId,
-        status: 'ASSIGNED',
-      },
+      'http://localhost:8080/api/task-status/update',
+      { taskId, workerId, status: 'ASSIGNED' },
       { withCredentials: true }
     );
 
-    alert('✅ Task sent and status updated to ASSIGNED!');
-   
-
+    alert('✅ Task assigned!');
   } catch (err) {
-    console.error('❌ Failed to send task or update status:', err);
-    alert('❌ Failed to send task or update status. Check console for details.');
+    console.error(err);
+    alert('❌ Assignment failed—see console.');
   }
 };
+
+
 
 
 
@@ -152,30 +125,79 @@ const handleSendTask = async (worker) => {
           </ul>
 
           {/* Edit Task Form */}
-          {editTask && (
-            <div className="mt-6 border p-4 rounded shadow">
-              <h3 className="text-lg font-semibold mb-2">Edit Task</h3>
-              <input
-                className="w-full border p-2 mb-2 rounded"
-                type="text"
-                value={editTask.title}
-                onChange={(e) => setEditTask({ ...editTask, title: e.target.value })}
-              />
-              {/* Add other fields if needed */}
-              <button
-                onClick={handleUpdate}
-                className="bg-green-600 text-white px-4 py-2 rounded mr-2"
-              >
-                Save
-              </button>
-              <button
-                onClick={() => setEditTask(null)}
-                className="px-4 py-2 border rounded"
-              >
-                Cancel
-              </button>
-            </div>
-          )}
+         {editTask && (
+  <div className="mt-6 border p-4 rounded shadow">
+    <h3 className="text-lg font-semibold mb-2">Edit Task</h3>
+
+    {/* Title */}
+    <input
+      className="w-full border p-2 mb-2 rounded"
+      type="text"
+      value={editTask.title}
+      onChange={(e) => setEditTask({ ...editTask, title: e.target.value })}
+      placeholder="Title"
+    />
+
+    {/* Description */}
+    <textarea
+      className="w-full border p-2 mb-2 rounded"
+      value={editTask.description}
+      onChange={(e) => setEditTask({ ...editTask, description: e.target.value })}
+      placeholder="Description"
+    />
+
+    {/* Required Skills */}
+    <input
+      className="w-full border p-2 mb-2 rounded"
+      type="text"
+      value={editTask.requiredSkills}
+      onChange={(e) => setEditTask({ ...editTask, requiredSkills: e.target.value })}
+      placeholder="Required Skills"
+    />
+
+    {/* Minimum Rating */}
+    <input
+      className="w-full border p-2 mb-2 rounded"
+      type="number"
+      step="0.1"
+      value={editTask.minRating}
+      onChange={(e) => setEditTask({ ...editTask, minRating: parseFloat(e.target.value) })}
+      placeholder="Minimum Rating"
+    />
+
+    {/* Scheduled Date */}
+    <input
+      className="w-full border p-2 mb-2 rounded"
+      type="datetime-local"
+      value={editTask.scheduledDate ? editTask.scheduledDate.slice(0, 16) : ''}
+      onChange={(e) => setEditTask({ ...editTask, scheduledDate: e.target.value })}
+    />
+
+    {/* Allocated Amount */}
+    <input
+      className="w-full border p-2 mb-2 rounded"
+      type="number"
+      step="0.01"
+      value={editTask.allocatedAmount}
+      onChange={(e) => setEditTask({ ...editTask, allocatedAmount: parseFloat(e.target.value) })}
+      placeholder="Allocated Amount"
+    />
+
+    {/* Buttons */}
+    <button
+      onClick={handleUpdate}
+      className="bg-green-600 text-white px-4 py-2 rounded mr-2"
+    >
+      Save
+    </button>
+    <button
+      onClick={() => setEditTask(null)}
+      className="px-4 py-2 border rounded"
+    >
+      Cancel
+    </button>
+  </div>
+)}
         </div>
 
         {/* Right side - Matched Workers */}

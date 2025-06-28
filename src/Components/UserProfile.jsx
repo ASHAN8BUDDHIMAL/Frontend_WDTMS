@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaCommentAlt } from 'react-icons/fa';
 
-const Profile = () => {
+const Profile = ({ currentUserId }) => {
   const [user, setUser] = useState(null);
   const [profilePicUrl, setProfilePicUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -16,6 +19,11 @@ const Profile = () => {
         if (res.ok) {
           const data = await res.json();
           setUser(data);
+          
+          // Store user ID and name in session storage
+          sessionStorage.setItem('userId', data.id);
+          sessionStorage.setItem('userName', `${data.firstName} ${data.lastName}`);
+          
           fetchProfilePic(data.email);
         }
       } catch (error) {
@@ -38,6 +46,9 @@ const Profile = () => {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         setProfilePicUrl(url);
+        
+        // Store profile picture URL in session storage
+        sessionStorage.setItem('userAvatar', url);
       } else {
         setProfilePicUrl(null);
       }
@@ -74,14 +85,33 @@ const Profile = () => {
     }
   };
 
+  const handleMessageClick = () => {
+    if (!currentUserId || !user) return;
+    
+    navigate('/chat', { 
+      state: { 
+        predefinedRecipient: {
+          id: user.id,
+          name: `${user.firstName} ${user.lastName}`,
+          avatar: profilePicUrl
+        }
+      } 
+    });
+  };
+
   if (loading) return <div className="text-center mt-10">Loading...</div>;
   if (!user) return <div className="text-center mt-10 text-red-600">User not found.</div>;
 
-  const fullName = `${user.firstName} ${user.lastName}`;
-  const fullAddress = `${user.address}, ${user.city}, ${user.district}, ${user.postalCode}`;
-
   return (
-    <div className="max-w-10xl mx-auto p-6 mt-10 space-y-5 border border-blue-200 rounded-xl p-5 bg-white">
+    <div className="max-w-10xl mx-auto p-6 mt-10 space-y-5 border border-blue-200 rounded-xl p-5 bg-white relative">
+      <button 
+        onClick={handleMessageClick}
+        className="absolute top-4 right-4 p-2 bg-blue-100 rounded-full hover:bg-blue-200 transition"
+        title="Send Message"
+      >
+        <FaCommentAlt className="text-blue-600 text-xl" />
+      </button>
+
       <div className="flex flex-col md:flex-row items-center gap-8">
         <div className="text-center">
           {profilePicUrl ? (
@@ -116,7 +146,7 @@ const Profile = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
             <div>
               <p className="text-sm text-gray-500">Full Name</p>
-              <p className="font-medium">{fullName}</p>
+              <p className="font-medium">{`${user.firstName} ${user.lastName}`}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Email</p>
@@ -132,7 +162,7 @@ const Profile = () => {
             </div>
             <div className="sm:col-span-2">
               <p className="text-sm text-gray-500">Address</p>
-              <p className="font-medium">{fullAddress}</p>
+              <p className="font-medium">{`${user.address}, ${user.city}, ${user.district}, ${user.postalCode}`}</p>
             </div>
           </div>
         </div>
