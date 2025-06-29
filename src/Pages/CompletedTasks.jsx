@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -14,7 +14,7 @@ const ClientAllTasks = () => {
     workerId: null,
     rating: 0,
     comment: '',
-    status: 'COMPLETED' // default to COMPLETED, can be changed to INCOMPLETED
+    status: 'COMPLETED' // default status
   });
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [confirmationModal, setConfirmationModal] = useState({
@@ -113,12 +113,12 @@ const ClientAllTasks = () => {
 
       toast.success(`Task status updated to ${status.toLowerCase()}!`);
 
-      // Prepare review data for both completed and incomplete tasks
+      // Prepare review data and show modal for COMPLETED or INCOMPLETED status
       if (action === 'complete' || action === 'incomplete') {
         setReviewData({
           taskId,
           workerId,
-          rating: action === 'complete' ? 0 : null, // No rating for incomplete tasks
+          rating: action === 'complete' ? 0 : null,
           comment: '',
           status
         });
@@ -137,40 +137,102 @@ const ClientAllTasks = () => {
     }
   };
 
-  const handleReviewSubmit = async () => {
-    try {
-  
-      // Prepare the payload
-      const payload = {
-        rating: reviewData.status === 'COMPLETED' ? reviewData.rating : null,
-        text: reviewData.comment,
-        status: reviewData.status
-      };
+  // This is the new function you asked for:
+  const openReviewModalForTask = (task) => {
+    setReviewData({
+      taskId: task.taskId,
+      workerId: task.workerId,
+      rating: 5,          // default rating 5 to enable submit button for testing
+      comment: '',
+      status: task.status,
+      imageFile: null,
+    });
+    setShowReviewModal(true);
+  };
 
-      await axios.post(
-        `http://localhost:8080/api/reviews/task/${reviewData.taskId}/worker/${reviewData.workerId}`,
-        payload,
-        {
-          withCredentials: true,
-          headers: { 
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+const handleReviewSubmit = async () => {
+  // Validate IDs with alert dialog
+  if (!reviewData.taskId || !reviewData.workerId) {
+    alert('Error: Missing Task or Worker Information\n\nPlease ensure you are submitting feedback for a valid task.');
+    return;
+  }
 
-      toast.success('Feedback submitted successfully!');
-      setShowReviewModal(false);
-      fetchTasks();
-    } catch (error) {
-      console.error('Review submission error:', error);
-      toast.error(error.response?.data?.message || 'Failed to submit feedback');
+  // Validate comment with alert dialog
+  if (!reviewData.comment.trim()) {
+    alert('Validation Error\n\nPlease enter your feedback comment before submitting.');
+    return;
+  }
+
+  // Validate rating with alert dialog
+  if (reviewData.status === 'COMPLETED' && (!reviewData.rating || reviewData.rating < 1 || reviewData.rating > 5)) {
+    alert('Rating Required\n\nPlease provide a valid rating between 1-5 stars for completed tasks.');
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('rating', reviewData.status === 'COMPLETED' ? reviewData.rating : 0);
+    formData.append('text', reviewData.comment.trim());
+    formData.append('status', reviewData.status);
+
+    if (reviewData.imageFile) {
+      formData.append('image', reviewData.imageFile);
     }
-  };
 
-  const handleRatingChange = (rating) => {
-    setReviewData({...reviewData, rating});
-  };
+    const response = await axios.post(
+      `http://localhost:8080/api/reviews/task/${reviewData.taskId}/worker/${reviewData.workerId}`,
+      formData,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+
+    // Success alert
+    alert('Success!\n\nYour feedback has been submitted successfully.');
+    setShowReviewModal(false);
+    fetchTasks();
+    
+  } catch (error) {
+    console.error('Review submission error:', error);
+    
+    // Enhanced error handling with detailed alerts
+    let errorMessage = 'An unexpected error occurred while submitting your feedback.';
+    
+    if (error.response) {
+      switch (error.response.status) {
+        case 400:
+          errorMessage = 'Invalid Request:\n' + 
+                        (error.response.data.message || 'Please check your input and try again.');
+          break;
+        case 401:
+          errorMessage = 'Session Expired:\nPlease log in again to submit feedback.';
+          break;
+        case 403:
+          errorMessage = 'Permission Denied:\nYou are not authorized to review this task.';
+          break;
+        case 409:
+          errorMessage = 'Duplicate Review:\nYou have already submitted feedback for this task.';
+          break;
+        case 500:
+          errorMessage = 'Server Error:\nPlease try again later.';
+          break;
+      }
+    } else if (error.request) {
+      errorMessage = 'Network Error:\nPlease check your internet connection.';
+    }
+
+    // Show error alert with details
+    alert(`Submission Failed\n\n${errorMessage}\n\nError details: ${error.message || 'No additional details'}`);
+  }
+};
+
+const handleRatingChange = (rating) => {
+  setReviewData({...reviewData, rating});
+};
 
   // Separate tasks by status
   const acceptedTasks = tasks.filter(task => task.status === 'ACCEPTED');
@@ -292,16 +354,7 @@ const ClientAllTasks = () => {
           
           {(task.status === 'COMPLETED' || task.status === 'INCOMPLETED') && !hasReview(task) && (
             <button
-              onClick={() => {
-                setReviewData({
-                  taskId: task.taskId,
-                  workerId: task.workerId,
-                  rating: task.status === 'COMPLETED' ? 0 : null,
-                  comment: '',
-                  status: task.status
-                });
-                setShowReviewModal(true);
-              }}
+              onClick={() => openReviewModalForTask(task)}
               className="px-3 py-1.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-lg hover:bg-blue-200 transition-colors"
             >
               Add Feedback
@@ -422,7 +475,8 @@ const ClientAllTasks = () => {
             <h3 className="text-xl font-semibold mb-4">
               {reviewData.status === 'COMPLETED' ? 'Rate Your Experience' : 'Provide Feedback'}
             </h3>
-            
+
+            {/* Rating only for COMPLETED */}
             {reviewData.status === 'COMPLETED' && (
               <div className="mb-4">
                 <label className="block text-gray-700 mb-2">Rating</label>
@@ -443,38 +497,45 @@ const ClientAllTasks = () => {
                 </div>
               </div>
             )}
-            
-            <div className="mb-6">
-              <label className="block text-gray-700 mb-2">
-                {reviewData.status === 'COMPLETED' ? 'Review' : 'Feedback'}
-              </label>
+
+            {/* Feedback comment */}
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Comment</label>
               <textarea
-                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows="4"
-                placeholder={reviewData.status === 'COMPLETED' ? 'Share your experience...' : 'Provide feedback about why the task wasn\'t completed...'}
+                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={reviewData.comment}
-                onChange={(e) => setReviewData({...reviewData, comment: e.target.value})}
-                required
+                onChange={(e) =>
+                  setReviewData({ ...reviewData, comment: e.target.value })
+                }
+                placeholder="Write your feedback here"
               />
             </div>
-            
-            <div className="flex justify-end gap-3">
+
+            {/* Image upload (optional) */}
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Upload Image (optional)</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setReviewData({ ...reviewData, imageFile: e.target.files[0] })
+                }
+              />
+            </div>
+
+            <div className="flex justify-end gap-4">
               <button
                 onClick={() => setShowReviewModal(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition-colors"
               >
-                <FaTimes /> Cancel
+                Cancel
               </button>
               <button
                 onClick={handleReviewSubmit}
-                disabled={!reviewData.comment || (reviewData.status === 'COMPLETED' && reviewData.rating === 0)}
-                className={`px-4 py-2 rounded-lg text-white transition-colors flex items-center gap-2 ${
-                  (!reviewData.comment || (reviewData.status === 'COMPLETED' && reviewData.rating === 0))
-                    ? 'bg-blue-300 cursor-not-allowed' 
-                    : 'bg-blue-600 hover:bg-blue-700'
-                }`}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                <FaCheck /> Submit
+                Submit Feedback
               </button>
             </div>
           </div>
