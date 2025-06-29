@@ -30,6 +30,7 @@ import WorkerProfile from "./Pages/WorkerProfile";
 import WorkerCompletedTasks from "./Pages/WorkerCompletedTasks";
 import AvailabilityCalendar from "./Pages/AvailabilityCalendar";
 import ReviewRating from "./Pages/ReviewRating";
+import WorkerReport from "./Pages/WorkerReport";
 
 function App() {
   return (
@@ -72,6 +73,7 @@ function App() {
          <Route path="/worker/worker-profile" element={<WorkerProfile />} />
          <Route path="/worker/availability-calendar" element={<AvailabilityCalendar />} />
          <Route path="/worker/review-rating" element={<ReviewRating />} />
+         <Route path="/worker/worker-report" element={<WorkerReport />} />
         </Route>
       </Routes>
     </Router>
