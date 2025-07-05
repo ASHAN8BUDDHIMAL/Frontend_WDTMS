@@ -65,9 +65,9 @@ const WorkerReport = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-8">
-        <div className="flex justify-between items-center mb-6 mt-10">
+    <div className="min-h-screen bg-gray-200 p-6">
+      <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-8 mt-12">
+        <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-indigo-700">Worker Performance Report</h1>
             <p className="text-gray-500 mt-1">Summary of monthly and yearly activity</p>
