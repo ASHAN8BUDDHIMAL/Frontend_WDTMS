@@ -24,8 +24,8 @@ const AdminNavbar = () => {
           <div className="hidden md:flex space-x-6">
             <Link to="/admin/manage-users" className="nav-link">Users</Link>
             <Link to="/admin/notice" className="nav-link">Notice</Link>
-            <Link to="/admin/manage-tasks" className="nav-link">Manage Tasks</Link>
-            <Link to="/admin/reports" className="nav-link">Reports</Link>
+            {/* <Link to="/admin/manage-tasks" className="nav-link">Manage Tasks</Link> */}
+            <Link to="/admin/admin-report" className="nav-link">Reports</Link>
             <Link to="/admin/settings" className="nav-link">Settings</Link>
           </div>
 

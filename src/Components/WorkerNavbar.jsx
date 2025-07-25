@@ -24,7 +24,7 @@ const WorkerNavbar = () => {
           <div className="hidden md:flex space-x-6">
             <Link to="/worker/tasks-assigned" className="nav-link">Tasks</Link>
             <Link to="/worker/availability-calendar" className="nav-link">Availability</Link>
-            <Link to="/worker/completed-tasks" className="nav-link">Completed</Link>
+            {/* <Link to="/worker/completed-tasks" className="nav-link">Completed</Link> */}
             <Link to="/worker/worker-report" className="nav-link">Report</Link>
             <Link to="/worker/review-rating" className="nav-link">Reviews</Link>
             <Link to="/worker/worker-chat" className="nav-link flex items-center gap-1">

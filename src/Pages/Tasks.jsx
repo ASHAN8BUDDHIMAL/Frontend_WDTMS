@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import TaskLocation from '../Components/TaskLocation';
+import ShowNotice from '../Components/ShowNotice';
 
 const TaskPage = ({ taskId = null }) => {
   const [task, setTask] = useState({
@@ -62,7 +63,7 @@ const TaskPage = ({ taskId = null }) => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 py-10">
       <div className="max-w-4xl mx-auto px-4 mt-10">
         <div className="bg-white shadow-2xl rounded-2xl p-8 space-y-6">
-
+           <ShowNotice />
           <h1 className="text-3xl font-bold mb-6 text-center text-blue-900">
             {isEditing ? 'Edit Task' : taskCreated ? 'Task Created - Set Location' : 'Create New Task'}
           </h1>

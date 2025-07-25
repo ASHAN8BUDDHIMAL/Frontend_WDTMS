@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import ShowNotice from '../Components/ShowNotice';
 
 const WorkerTasksAssigned = () => {
   const [tasks, setTasks] = useState([]);
@@ -46,8 +47,9 @@ const WorkerTasksAssigned = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 py-10">
-      <div className="max-w-7xl mx-auto px-4 mt-10">
-        <div className="bg-white shadow-2xl rounded-2xl p-8 space-y-6 w-6xl">
+      <div className="max-w-4xl mx-auto px-4 mt-10">
+        <div className="bg-white shadow-2xl rounded-2xl p-8 space-y-6 w-4xl">
+          <ShowNotice />
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Assigned Tasks</h2>
 
           {tasks.length === 0 ? (

@@ -56,10 +56,10 @@ export default function Login() {
       className="min-h-screen bg-cover bg-center relative"
       style={{ backgroundImage: "url('https://source.unsplash.com/1600x900/?technology')" }}
     >
-      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-50 to-blue-100"></div>
 
       <div className="relative z-10 flex items-center justify-center min-h-screen">
-        <div className="bg-white bg-opacity-90 backdrop-blur-md rounded-xl shadow-lg p-10 w-full max-w-md">
+        <div className="bg-white bg-opacity-90 backdrop-blur-md rounded-xl shadow-2xl p-10 w-full max-w-md">
           <h2 className="text-3xl font-bold text-center text-blue-700 mb-6">Welcome Back</h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">

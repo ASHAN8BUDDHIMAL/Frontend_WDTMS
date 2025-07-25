@@ -20,7 +20,7 @@ import ViewProfile from "./Pages/ViewProfile";
 
 import ManageUsers from "./Pages/ManageUsers";
 import ManageTasks from "./Pages/ManageTasks";
-import Reports from "./Pages/Reports";
+import AdminReport from "./Pages/AdminReport";
 import Settings from "./Pages/Settings";
 import Notice from "./Pages/Notice";
 
@@ -62,7 +62,7 @@ function App() {
           <Route path="/admin/notice" element={<Notice />} />
           <Route path="/admin/manage-users" element={<ManageUsers />} />
           <Route path="/admin/manage-tasks" element={<ManageTasks />} />
-          <Route path="/admin/reports" element={<Reports />} />
+          <Route path="/admin/admin-report" element={<AdminReport />} />
           <Route path="/admin/settings" element={<Settings />} />
         </Route>
 

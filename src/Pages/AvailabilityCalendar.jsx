@@ -1,4 +1,3 @@
-// ✅ All import statements MUST be at the top
 import React, { useEffect, useState } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -7,7 +6,7 @@ import parse from 'date-fns/parse';
 import startOfWeek from 'date-fns/startOfWeek';
 import getDay from 'date-fns/getDay';
 import enUS from 'date-fns/locale/en-US';
-import { Modal, Button, Input, TimePicker, Form, message } from 'antd';
+import { Modal, Button, message, Form, Input, TimePicker, DatePicker } from 'antd';
 import axios from 'axios';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -29,177 +28,191 @@ const localizer = dateFnsLocalizer({
 const AvailabilityCalendar = () => {
   const [events, setEvents] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [form] = Form.useForm();
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [form] = Form.useForm();
 
-  // Fetch bookings on mount
+  // Fetch busy dates
   useEffect(() => {
-    axios
-      .get('http://localhost:8080/api/busy/my')
-      .then((response) => {
-        // Map backend data to calendar events with JS Date objects for start/end
-        const loadedEvents = response.data.map((event) => ({
+    fetchBusyDates();
+  }, []);
+
+  const fetchBusyDates = () => {
+    axios.get('http://localhost:8080/api/busy/my')
+      .then(response => {
+        const formattedEvents = response.data.map(event => ({
           ...event,
           start: new Date(`${event.date}T${event.startTime}`),
           end: new Date(`${event.date}T${event.endTime}`),
+          isManual: event.clientId === null
         }));
-        setEvents(loadedEvents);
+        setEvents(formattedEvents);
       })
-      .catch((error) => {
-        console.error('Failed to load availability:', error.response?.data || error.message);
-        message.error('Failed to load availability');
+      .catch(error => {
+        console.error('Error fetching busy dates:', error);
+        message.error('Failed to load busy dates');
       });
-  }, []);
+  };
 
-  // When user clicks on an empty slot
-  const handleSelectSlot = ({ start }) => {
-    setSelectedDate(start);
+  const handleSelectSlot = ({ start, end }) => {
     setSelectedEvent(null);
     form.resetFields();
+    form.setFieldsValue({
+      date: dayjs(start),
+      startTime: dayjs(start),
+      endTime: dayjs(end)
+    });
     setModalVisible(true);
   };
 
-  // When user clicks on an existing event
-  const handleEventSelect = (event) => {
+  const handleSelectEvent = (event) => {
     setSelectedEvent(event);
     setModalVisible(true);
-    form.setFieldsValue({
-      title: event.title,
-      startTime: dayjs(event.start),
-      endTime: dayjs(event.end),
-    });
+    
+    if (event.clientId === null) {
+      form.setFieldsValue({
+        title: event.title,
+        date: dayjs(event.date),
+        startTime: dayjs(event.startTime, 'HH:mm:ss'),
+        endTime: dayjs(event.endTime, 'HH:mm:ss'),
+        taskCity: event.taskCity
+      });
+    }
   };
 
-  // Save new or edited availability
-  const handleFormSubmit = () => {
-    form.validateFields().then((values) => {
+  const handleSave = () => {
+    form.validateFields().then(values => {
       const payload = {
-        title: values.title,
-        startTime: dayjs(values.startTime).format('HH:mm'),
-        endTime: dayjs(values.endTime).format('HH:mm'),
-        date: dayjs(selectedDate).format('YYYY-MM-DD'),
+        title: values.title || 'Busy',
+        date: dayjs(values.date).format('YYYY-MM-DD'),
+        startTime: dayjs(values.startTime).format('HH:mm:ss'),
+        endTime: dayjs(values.endTime).format('HH:mm:ss'),
+        taskCity: values.taskCity
       };
 
-      // If editing an existing event, do update (PUT), else create (POST)
-      const request = selectedEvent
+      const apiCall = selectedEvent?.isManual
         ? axios.put(`http://localhost:8080/api/busy/${selectedEvent.id}`, payload)
         : axios.post('http://localhost:8080/api/busy', payload);
 
-      request
-        .then((response) => {
-          // Update events state
-          if (selectedEvent) {
-            // Replace updated event
-            setEvents((prev) =>
-              prev.map((evt) => (evt.id === selectedEvent.id ? {
-                ...response.data,
-                start: new Date(`${response.data.date}T${response.data.startTime}`),
-                end: new Date(`${response.data.date}T${response.data.endTime}`),
-              } : evt))
-            );
-          } else {
-            // Add new event
-            const newEvent = {
-              ...response.data,
-              start: new Date(`${response.data.date}T${response.data.startTime}`),
-              end: new Date(`${response.data.date}T${response.data.endTime}`),
-            };
-            setEvents((prev) => [...prev, newEvent]);
-          }
-
+      apiCall
+        .then(() => {
+          message.success('Busy date saved successfully');
+          fetchBusyDates();
           setModalVisible(false);
-          form.resetFields();
-          message.success('Availability saved successfully!');
         })
-        .catch((error) => {
-          console.error('Error saving availability:', error.response?.data || error.message);
-          message.error('Error saving availability');
+        .catch(error => {
+          console.error('Error saving busy date:', error.response?.data || error.message);
+          message.error(error.response?.data?.message || 'Failed to save busy date');
         });
     });
   };
 
-  // Delete availability event
   const handleDelete = () => {
-    if (!selectedEvent || !selectedEvent.id) {
-      return;
-    }
+    if (!selectedEvent?.isManual) return;
 
     Modal.confirm({
-      title: 'Are you sure you want to delete this availability?',
+      title: 'Delete Busy Date',
       icon: <ExclamationCircleOutlined />,
+      content: 'Are you sure you want to delete this busy date?',
       onOk: () => {
-        axios
-          .delete(`http://localhost:8080/api/busy/${selectedEvent.id}`)
+        axios.delete(`http://localhost:8080/api/busy/${selectedEvent.id}`)
           .then(() => {
-            setEvents((prev) => prev.filter((e) => e.id !== selectedEvent.id));
-            message.success('Availability deleted');
+            message.success('Busy date deleted');
+            fetchBusyDates();
             setModalVisible(false);
           })
-          .catch((error) => {
-            console.error('Error deleting availability:', error.response?.data || error.message);
-            message.error('Failed to delete availability');
+          .catch(error => {
+            console.error('Error deleting busy date:', error);
+            message.error('Failed to delete busy date');
           });
-      },
+      }
     });
   };
 
+  const eventStyleGetter = (event) => {
+    let backgroundColor = '#3174ad';
+    if (event.clientId) {
+      backgroundColor = '#f50';
+    }
+    return {
+      style: {
+        backgroundColor,
+        borderRadius: '4px',
+        opacity: 0.8,
+        color: 'white',
+        border: '0px',
+        display: 'block'
+      }
+    };
+  };
+
   return (
-    <div className="pt-20 p-4 ">
-      {/* <h2 className="text-xl font-bold mb-4 text-center">Availability Calendar</h2> */}
+    <div className="pt-20 p-4">
+      <h2 className="text-xl font-bold mb-4">My Busy Dates Calendar</h2>
+      
       <Calendar
         localizer={localizer}
         events={events}
         selectable
         style={{ height: 600 }}
         onSelectSlot={handleSelectSlot}
-        onSelectEvent={handleEventSelect}
-        popup
+        onSelectEvent={handleSelectEvent}
+        eventPropGetter={eventStyleGetter}
       />
 
       <Modal
-        title={selectedEvent ? 'Edit Availability' : 'Add Availability'}
+        title={selectedEvent ? (selectedEvent.isManual ? 'Edit Busy Date' : 'Appointment Details') : 'Add Busy Date'}
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
         footer={[
-          selectedEvent && (
+          <Button key="cancel" onClick={() => setModalVisible(false)}>
+            Cancel
+          </Button>,
+          selectedEvent?.isManual && (
             <Button key="delete" danger onClick={handleDelete}>
               Delete
             </Button>
           ),
-          <Button key="cancel" onClick={() => setModalVisible(false)}>
-            Cancel
-          </Button>,
-          <Button
-          key="save"
-          type="primary"
-          onClick={handleFormSubmit}
-          style={{ backgroundColor: '#52c41a', borderColor: '#52c41a', color: 'white' }}
-        >
-          Save
-        </Button>
-,
+          (!selectedEvent || selectedEvent?.isManual) && (
+            <Button key="save" type="primary" onClick={handleSave}>
+              Save
+            </Button>
+          )
         ]}
+        width={700}
       >
-        <Form form={form} layout="vertical">
-          <Form.Item name="title" label="Title" rules={[{ required: true, message: 'Please enter a title' }]}>
-            <Input placeholder="e.g. Personal Appointment" />
-          </Form.Item>
-          <Form.Item
-            name="startTime"
-            label="Start Time"
-            rules={[{ required: true, message: 'Please select start time' }]}
-          >
-            <TimePicker format="HH:mm" />
-          </Form.Item>
-          <Form.Item
-            name="endTime"
-            label="End Time"
-            rules={[{ required: true, message: 'Please select end time' }]}
-          >
-            <TimePicker format="HH:mm" />
-          </Form.Item>
-        </Form>
+        {selectedEvent && !selectedEvent.isManual ? (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p><strong>Date:</strong> {dayjs(selectedEvent.date).format('YYYY-MM-DD')}</p>
+              <p><strong>Time:</strong> {selectedEvent.startTime} - {selectedEvent.endTime}</p>
+              <p><strong>Title:</strong> {selectedEvent.title}</p>
+            </div>
+            <div>
+              <p><strong>Client:</strong> {selectedEvent.clientFirstName || 'N/A'} {selectedEvent.clientLastName || 'N/A'}</p>
+              <p><strong>Location:</strong> {selectedEvent.taskCity || 'N/A'}</p>
+            </div>
+          </div>
+        ) : (
+          <Form form={form} layout="vertical">
+            <div className="grid grid-cols-2 gap-4">
+              <Form.Item name="title" label="Title">
+                <Input placeholder="e.g. Personal Appointment" />
+              </Form.Item>
+              <Form.Item name="taskCity" label="Location">
+                <Input placeholder="City/Town" />
+              </Form.Item>
+              <Form.Item name="date" label="Date" rules={[{ required: true }]}>
+                <DatePicker style={{ width: '100%' }} />
+              </Form.Item>
+              <Form.Item name="startTime" label="Start Time" rules={[{ required: true }]}>
+                <TimePicker format="HH:mm" style={{ width: '100%' }} />
+              </Form.Item>
+              <Form.Item name="endTime" label="End Time" rules={[{ required: true }]}>
+                <TimePicker format="HH:mm" style={{ width: '100%' }} />
+              </Form.Item>
+            </div>
+          </Form>
+        )}
       </Modal>
     </div>
   );
