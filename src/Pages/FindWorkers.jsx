@@ -66,7 +66,11 @@ const FindWorker = () => {
         `http://localhost:8080/api/match/workers/${task.id}`,
         { withCredentials: true }
       );
-      setMatchedWorkers(response.data);
+      
+      // Sort workers by score in descending order
+      const sortedWorkers = response.data.sort((a, b) => b.score - a.score);
+      
+      setMatchedWorkers(sortedWorkers);
       setSelectedTaskId(task.id);
       setActiveTab('workers');
     } catch (err) {
@@ -74,7 +78,8 @@ const FindWorker = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+};
+
 
   const handleSendTask = async (worker) => {
     const workerId = worker.userId;
@@ -103,13 +108,10 @@ const FindWorker = () => {
     task.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  return (
+   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8 mt-12">
-          {/* <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            Task & Worker Management
-          </h1> */}
           <p className="mt-3 text-xl text-gray-500">
             Find the perfect worker for your tasks
           </p>
@@ -123,6 +125,7 @@ const FindWorker = () => {
               <button
                 onClick={() => setActiveTab('tasks')}
                 className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center justify-center space-x-2 ${activeTab === 'tasks' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                aria-current={activeTab === 'tasks' ? 'page' : undefined}
               >
                 <FiTool className="h-5 w-5" />
                 <span>My Tasks</span>
@@ -131,6 +134,7 @@ const FindWorker = () => {
                 onClick={() => setActiveTab('workers')}
                 className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center justify-center space-x-2 ${activeTab === 'workers' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
                 disabled={matchedWorkers.length === 0}
+                aria-current={activeTab === 'workers' ? 'page' : undefined}
               >
                 <FiUser className="h-5 w-5" />
                 <span>Matched Workers ({matchedWorkers.length})</span>
@@ -153,6 +157,7 @@ const FindWorker = () => {
                       placeholder="Search tasks..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
+                      aria-label="Search tasks"
                     />
                   </div>
                 </div>
@@ -160,6 +165,7 @@ const FindWorker = () => {
                 {isLoading ? (
                   <div className="flex justify-center items-center py-12">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+                    <span className="sr-only">Loading...</span>
                   </div>
                 ) : filteredTasks.length === 0 ? (
                   <div className="text-center py-12">
@@ -172,7 +178,7 @@ const FindWorker = () => {
                 ) : (
                   <div className="space-y-4">
                     {filteredTasks.map((task) => (
-                      <div key={task.id} className="bg-gray-50 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-300  ">
+                      <div key={task.id} className="bg-gray-50 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-300">
                         <div className="flex justify-between items-start">
                           <div>
                             <h3 className="text-lg font-semibold text-gray-900">{task.title}</h3>
@@ -194,6 +200,7 @@ const FindWorker = () => {
                               onClick={() => setEditTask(task)}
                               className="p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-full"
                               title="Edit"
+                              aria-label="Edit task"
                             >
                               <FiEdit className="h-5 w-5" />
                             </button>
@@ -201,6 +208,7 @@ const FindWorker = () => {
                               onClick={() => handleDelete(task.id)}
                               className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-full"
                               title="Delete"
+                              aria-label="Delete task"
                             >
                               <FiTrash2 className="h-5 w-5" />
                             </button>
@@ -208,6 +216,7 @@ const FindWorker = () => {
                               onClick={() => handleFindWorkers(task)}
                               className="p-2 text-purple-600 hover:text-purple-900 hover:bg-purple-50 rounded-full"
                               title="Find Workers"
+                              aria-label="Find workers for this task"
                             >
                               <FiSearch className="h-5 w-5" />
                             </button>
@@ -220,7 +229,7 @@ const FindWorker = () => {
               </div>
             )}
 
-            {/* Workers Tab */}
+               {/* Workers Tab */}
             {activeTab === 'workers' && (
               <div>
                 <div className="flex justify-between items-center mb-6">
@@ -236,6 +245,7 @@ const FindWorker = () => {
                 {isLoading ? (
                   <div className="flex justify-center items-center py-12">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+                    <span className="sr-only">Loading...</span>
                   </div>
                 ) : matchedWorkers.length === 0 ? (
                   <div className="text-center py-12">
@@ -248,8 +258,16 @@ const FindWorker = () => {
                 ) : (
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {matchedWorkers.map((worker) => (
-                      <div key={worker.id} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
+                      <div key={worker.userId} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
                         <div className="p-6">
+                          <div className="flex justify-start mb-4">
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              worker.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            }`}>
+                              {worker.available ? 'Available' : 'Unavailable'}
+                            </span>
+                          </div>
+                          
                           <div className="flex items-center">
                             <div className="flex-shrink-0 bg-indigo-100 rounded-full p-3">
                               <FiUser className="h-8 w-8 text-indigo-600" />
@@ -262,8 +280,8 @@ const FindWorker = () => {
                                   {[1, 2, 3, 4, 5].map((rating) => (
                                     <FiStar
                                       key={rating}
-                                      className={`h-4 w-4 ${rating <= Math.floor(worker.rating) ? 'text-yellow-400' : 'text-gray-300'}`}
-                                      fill={rating <= Math.floor(worker.rating) ? 'currentColor' : 'none'}
+                                      className={`h-4 w-4 ${rating <= Math.floor(worker.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`}
+                                      fill={rating <= Math.floor(worker.rating || 0) ? 'currentColor' : 'none'}
                                     />
                                   ))}
                                 </div>
@@ -273,11 +291,13 @@ const FindWorker = () => {
                               </div>
                             </div>
                           </div>
+                          
                           <div className="mt-4">
                             <p className="text-sm text-gray-600 line-clamp-3">
                               {worker.bio || 'No bio available'}
                             </p>
                           </div>
+                          
                           <div className="mt-6 flex justify-between space-x-3">
                             <button
                               onClick={() => navigate(`/view-profile/${worker.userId}`)}
@@ -306,8 +326,8 @@ const FindWorker = () => {
 
         {/* Edit Task Modal */}
         {editTask && (
-          <div className="fixed inset-0 overflow-y-auto z-50">
-            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div className="fixed z-50 inset-0 overflow-y-auto">
+            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
               <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                 <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
               </div>
@@ -318,7 +338,8 @@ const FindWorker = () => {
                     <h3 className="text-lg leading-6 font-medium text-gray-900">Edit Task</h3>
                     <button
                       onClick={() => setEditTask(null)}
-                      className="text-gray-400 hover:text-gray-500"
+                      className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                      aria-label="Close modal"
                     >
                       <FiX className="h-6 w-6" />
                     </button>

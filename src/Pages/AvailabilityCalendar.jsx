@@ -79,7 +79,7 @@ const AvailabilityCalendar = () => {
     }
   };
 
-  const handleSave = () => {
+ const handleSave = () => {
     form.validateFields().then(values => {
       const payload = {
         title: values.title || 'Busy',
@@ -89,13 +89,19 @@ const AvailabilityCalendar = () => {
         taskCity: values.taskCity
       };
 
-      const apiCall = selectedEvent?.isManual
+      // Always include the ID if it exists (for both manual and non-manual events)
+      if (selectedEvent?.id) {
+        payload.id = selectedEvent.id;
+      }
+
+      const apiCall = selectedEvent?.id
         ? axios.put(`http://localhost:8080/api/busy/${selectedEvent.id}`, payload)
         : axios.post('http://localhost:8080/api/busy', payload);
 
       apiCall
-        .then(() => {
+        .then((response) => {
           message.success('Busy date saved successfully');
+          console.log('Saved data:', response.data); // Debug log
           fetchBusyDates();
           setModalVisible(false);
         })
@@ -104,7 +110,7 @@ const AvailabilityCalendar = () => {
           message.error(error.response?.data?.message || 'Failed to save busy date');
         });
     });
-  };
+};
 
   const handleDelete = () => {
     if (!selectedEvent?.isManual) return;

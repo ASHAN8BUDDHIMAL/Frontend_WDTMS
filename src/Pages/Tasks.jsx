@@ -8,7 +8,7 @@ const TaskPage = ({ taskId = null }) => {
     title: '',
     description: '',
     requiredSkills: '',
-    minRating: '',
+    allocatedTime: '',
     scheduledDate: '',
     allocatedAmount: ''
   });
@@ -105,13 +105,14 @@ const TaskPage = ({ taskId = null }) => {
           />
           <input
             type="number"
-            name="minRating"
-            placeholder="Min Rating"
-            value={task.minRating}
+            name="allocatedTime"
+            placeholder="Task Duration (Hours)"
+            value={task.allocatedTime}
             onChange={handleChange}
             disabled={taskCreated && !isEditing}
             className="border p-3 rounded w-full"
           />
+
           <div>
             <label htmlFor="scheduledDate" className="block font-semibold mb-1">Schedule Date and Time</label>
             <input
