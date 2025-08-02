@@ -5,10 +5,16 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow-md px-6 py-4">
       <div className="container mx-auto flex justify-between items-center">
-        {/* Logo or Brand */}
-        <div className="text-2xl font-bold text-blue-600">
-          <Link to="/">findWorker</Link>
-        </div>
+        {/* Logo with Image and Text */}
+        <Link to="/" className="flex items-center space-x-2">
+          {/* Replace '/logo.png' with your actual logo image path */}
+          <img 
+            src="/images/FindWorkerLogo.png" 
+            alt="findWorker Logo" 
+            className="h-10 w-10 object-contain" 
+          />
+          <span className="text-2xl font-bold text-blue-600">findWorker</span>
+        </Link>
 
         {/* Navigation Links */}
         <ul className="flex space-x-6 text-gray-700 font-medium">
@@ -20,6 +26,9 @@ const Navbar = () => {
           </li>
           <li className="hover:text-blue-600 transition">
             <Link to="/services">Services</Link>
+          </li>
+          <li className="hover:text-blue-600 transition">
+            <Link to="/help">Help</Link>
           </li>
         </ul>
 

@@ -275,7 +275,7 @@ const FindWorker = () => {
                             <div className="ml-4">
                               <h3 className="text-lg font-medium text-gray-900">{worker.fullName}</h3>
                               <p className="text-sm text-indigo-600">{worker.skills}</p>
-                              <div className="mt-1 flex items-center">
+                              {/* <div className="mt-1 flex items-center">
                                 <div className="flex items-center">
                                   {[1, 2, 3, 4, 5].map((rating) => (
                                     <FiStar
@@ -288,15 +288,15 @@ const FindWorker = () => {
                                 <span className="ml-2 text-sm text-gray-500">
                                   {worker.rating?.toFixed(1) || 'No ratings'}
                                 </span>
-                              </div>
+                              </div> */}
                             </div>
                           </div>
                           
-                          <div className="mt-4">
+                          {/* <div className="mt-4">
                             <p className="text-sm text-gray-600 line-clamp-3">
                               {worker.bio || 'No bio available'}
                             </p>
-                          </div>
+                          </div> */}
                           
                           <div className="mt-6 flex justify-between space-x-3">
                             <button

@@ -7,6 +7,7 @@ import WorkerLayout from "./Layouts/WorkerLayout";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
 import Services from "./Pages/Services";
+import HelpCenter from "./Pages/HelpCenter";
 import Registration from "./Pages/Registration";
 import Login from "./Pages/Login";
 
@@ -19,7 +20,7 @@ import Newtasks from "./Pages/Newtasks";
 import ViewProfile from "./Pages/ViewProfile";
 
 import ManageUsers from "./Pages/ManageUsers";
-import ManageTasks from "./Pages/ManageTasks";
+import ManageTasks from "./Pages/HelpCenter";
 import AdminReport from "./Pages/AdminReport";
 import Settings from "./Pages/Settings";
 import Notice from "./Pages/Notice";
@@ -41,6 +42,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/help" element={<HelpCenter />} />
           <Route path="/registration" element={<Registration />} />
           <Route path="/login" element={<Login />} />
         </Route>
@@ -61,7 +63,6 @@ function App() {
          <Route element={<AdminLayout />}>
           <Route path="/admin/notice" element={<Notice />} />
           <Route path="/admin/manage-users" element={<ManageUsers />} />
-          <Route path="/admin/manage-tasks" element={<ManageTasks />} />
           <Route path="/admin/admin-report" element={<AdminReport />} />
           <Route path="/admin/settings" element={<Settings />} />
         </Route>

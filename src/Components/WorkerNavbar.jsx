@@ -17,9 +17,16 @@ const WorkerNavbar = () => {
     <nav className="bg-white/30 backdrop-blur-md shadow-md fixed w-full z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex-shrink-0 text-xl font-bold text-blue-700">findWorker</div>
-
+          {/* Logo with Image and Text */}
+                  <Link to="/" className="flex items-center space-x-2">
+                    {/* Replace '/logo.png' with your actual logo image path */}
+                    <img 
+                      src="/images/FindWorkerLogo.png" 
+                      alt="findWorker Logo" 
+                      className="h-10 w-10 object-contain" 
+                    />
+                    <span className="text-2xl font-bold text-blue-600">findWorker</span>
+                  </Link>
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-6">
             <Link to="/worker/tasks-assigned" className="nav-link">Tasks</Link>
