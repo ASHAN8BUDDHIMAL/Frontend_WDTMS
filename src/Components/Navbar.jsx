@@ -27,9 +27,13 @@ const Navbar = () => {
           <li className="hover:text-blue-600 transition">
             <Link to="/services">Services</Link>
           </li>
+           <li className="hover:text-blue-600 transition">
+            <Link to="/view-terms">Terms & Conditions</Link>
+          </li>
           <li className="hover:text-blue-600 transition">
             <Link to="/help">Help</Link>
           </li>
+         
         </ul>
 
         {/* Right Aligned Auth Links */}

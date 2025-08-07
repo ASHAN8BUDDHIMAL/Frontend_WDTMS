@@ -26,7 +26,7 @@ const AdminNavbar = () => {
             <Link to="/admin/notice" className="nav-link">Notice</Link>
             {/* <Link to="/admin/manage-tasks" className="nav-link">Manage Tasks</Link> */}
             <Link to="/admin/admin-report" className="nav-link">Reports</Link>
-            <Link to="/admin/settings" className="nav-link">Settings</Link>
+            <Link to="/admin/terms" className="nav-link">Terms & Conditions</Link>
           </div>
 
           {/* Profile Dropdown */}
@@ -62,7 +62,7 @@ const AdminNavbar = () => {
           <Link to="/admin/manage-users" className="block nav-link">Manage Users</Link>
           <Link to="/admin/manage-tasks" className="block nav-link">Manage Tasks</Link>
           <Link to="/admin/reports" className="block nav-link">Reports</Link>
-          <Link to="/admin/settings" className="block nav-link">Settings</Link>
+          <Link to="/admin/terms" className="block nav-link">Terms And Conditions</Link>
           <button onClick={handleLogout} className="w-full text-left text-red-600 hover:underline">Logout</button>
         </div>
       )}

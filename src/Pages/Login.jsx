@@ -15,20 +15,18 @@ export default function Login() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
-        credentials: 'include', // 👈 Add this
+        credentials: 'include',
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Save to localStorage if needed
-        //  localStorage.setItem('id', data.userId);//
         localStorage.setItem('userEmail', data.email);
         localStorage.setItem('userType', data.userType);
 
         alert('Login successful');
         sessionStorage.setItem("email", data.email);
-        // Navigate by user type (case-insensitive)
+        
         switch (data.userType.toLowerCase()) {
           case 'admin':
             navigate('/admin/manage-users');
@@ -53,14 +51,20 @@ export default function Login() {
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center relative"
-      style={{ backgroundImage: "url('https://source.unsplash.com/1600x900/?technology')" }}
+      className="min-h-screen bg-cover bg-center bg-fixed relative"
+      style={{ 
+       backgroundImage: "url('https://images.unsplash.com/photo-1600494603989-9650cf6ddd3d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80')",
+      }}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-50 to-blue-100"></div>
+      {/* Darker overlay for better text contrast */}
+      <div className="absolute inset-0 bg-gray-900/60"></div>
 
-      <div className="relative z-10 flex items-center justify-center min-h-screen">
-        <div className="bg-white bg-opacity-90 backdrop-blur-md rounded-xl shadow-2xl p-10 w-full max-w-md">
-          <h2 className="text-3xl font-bold text-center text-blue-700 mb-6">Welcome Back</h2>
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
+        <div className="bg-white bg-opacity-90 backdrop-blur-sm rounded-xl shadow-2xl p-8 sm:p-10 w-full max-w-md">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-gray-800">FindWorker Login</h2>
+            <p className="text-gray-600 mt-2">Access your account to continue</p>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -70,10 +74,11 @@ export default function Login() {
               <input
                 id="email"
                 type="email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                placeholder="your@email.com"
               />
             </div>
 
@@ -84,31 +89,43 @@ export default function Login() {
               <input
                 id="password"
                 type="password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                placeholder="••••••••"
               />
             </div>
 
             {errorMessage && (
-              <p className="text-sm text-red-600">{errorMessage}</p>
+              <p className="text-sm text-red-600 text-center py-2">{errorMessage}</p>
             )}
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+              className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition duration-300 shadow-md"
             >
               Log In
             </button>
           </form>
 
-          <p className="text-sm text-center text-gray-600 mt-6">
-            Don't have an account?{' '}
-            <a href="/registration" className="text-blue-500 hover:underline">
-              Sign up
-            </a>
-          </p>
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Don't have an account?{' '}
+              <a 
+                href="/registration" 
+                className="text-blue-600 hover:text-blue-800 font-medium hover:underline transition"
+              >
+                Sign up here
+              </a>
+            </p>
+            {/* <a 
+              href="/forgot-password" 
+              className="inline-block mt-2 text-sm text-gray-600 hover:text-blue-600 hover:underline transition"
+            >
+              Forgot password?
+            </a> */}
+          </div>
         </div>
       </div>
     </div>

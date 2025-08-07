@@ -6,6 +6,7 @@ const WorkerTasksAssigned = () => {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [updatingTaskId, setUpdatingTaskId] = useState(null);
+  const [activeTab, setActiveTab] = useState('ASSIGNED');
 
   const fetchAssignedTasks = async () => {
     try {
@@ -45,18 +46,91 @@ const WorkerTasksAssigned = () => {
     }
   };
 
+  // Filter tasks based on active tab
+  const filteredTasks = tasks.filter(task => {
+    if (activeTab === 'ASSIGNED') return task.status === 'ASSIGNED';
+    if (activeTab === 'CONFIRMED') return task.status === 'CONFIRMED';
+    if (activeTab === 'COMPLETED') return task.status === 'COMPLETED';
+    if (activeTab === 'INCOMPLETED') return task.status === 'INCOMPLETED';
+    return false;
+  });
+
+  // Count tasks for each tab
+  const taskCounts = {
+    ASSIGNED: tasks.filter(t => t.status === 'ASSIGNED').length,
+    CONFIRMED: tasks.filter(t => t.status === 'CONFIRMED').length,
+    COMPLETED: tasks.filter(t => t.status === 'COMPLETED').length,
+    INCOMPLETED: tasks.filter(t => t.status === 'INCOMPLETED').length,
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 py-10">
-      <div className="max-w-4xl mx-auto px-4 mt-10">
-        <div className="bg-white shadow-2xl rounded-2xl p-8 space-y-6 w-4xl">
+      <div className="max-w-6xl mx-auto px-4 mt-10">
+        <div className="bg-white shadow-1xl rounded-2xl p-8 space-y-6 w-4xl">
           <ShowNotice />
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Assigned Tasks</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">My Tasks</h2>
 
-          {tasks.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">No assigned tasks found.</p>
+          {/* Tabs */}
+          <div className="flex border-b border-gray-200">
+            <button
+              onClick={() => setActiveTab('ASSIGNED')}
+              className={`py-2 px-4 font-medium text-sm focus:outline-none flex items-center ${
+                activeTab === 'ASSIGNED'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Assigned
+              <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full">
+                {taskCounts.ASSIGNED}
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('CONFIRMED')}
+              className={`py-2 px-4 font-medium text-sm focus:outline-none flex items-center ${
+                activeTab === 'CONFIRMED'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Confirmed
+              <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full">
+                {taskCounts.CONFIRMED}
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('COMPLETED')}
+              className={`py-2 px-4 font-medium text-sm focus:outline-none flex items-center ${
+                activeTab === 'COMPLETED'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Completed
+              <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full">
+                {taskCounts.COMPLETED}
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('INCOMPLETED')}
+              className={`py-2 px-4 font-medium text-sm focus:outline-none flex items-center ${
+                activeTab === 'INCOMPLETED'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Incompleted
+              <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full">
+                {taskCounts.INCOMPLETED}
+              </span>
+            </button>
+          </div>
+
+          {filteredTasks.length === 0 ? (
+            <p className="text-gray-500 text-center py-8">No {activeTab.toLowerCase()} tasks found.</p>
           ) : (
             <div className="space-y-4 p-4">
-              {tasks.map(task => (
+              {filteredTasks.map(task => (
                 <div
                   key={task.taskId}
                   className="bg-white/90 backdrop-blur-sm border border-gray-500/50 rounded-lg p-4 shadow hover:shadow-md transition-shadow duration-300"
@@ -86,9 +160,9 @@ const WorkerTasksAssigned = () => {
                     <div className="w-full sm:w-1/6 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         task.status === 'ASSIGNED' ? 'bg-yellow-100 text-yellow-800' :
-                        task.status === 'ACCEPTED' ? 'bg-green-100 text-green-800' :
-                        task.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
-                        'bg-blue-100 text-blue-800' // For CONFIRMED or other statuses
+                        task.status === 'CONFIRMED' ? 'bg-blue-100 text-blue-800' :
+                        task.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                        'bg-red-100 text-red-800' // For INCOMPLETED
                       }`}>
                         {task.status}
                       </span>
@@ -105,7 +179,7 @@ const WorkerTasksAssigned = () => {
                         </button>
                         
                         {/* Only show Accept/Reject for ASSIGNED tasks */}
-                        {task.status === 'ASSIGNED' && (
+                        {activeTab === 'ASSIGNED' && (
                           <>
                             <button
                               onClick={() => handleStatusUpdate(task.taskId, 'ACCEPTED')}

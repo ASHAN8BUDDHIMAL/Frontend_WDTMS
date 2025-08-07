@@ -23,7 +23,7 @@ const TaskPage = ({ taskId = null }) => {
       axios.get(`http://localhost:8080/api/task/${taskId}`, { withCredentials: true })
         .then((res) => {
           setTask(res.data);
-          setTaskCreated(true); // since the task already exists
+          setTaskCreated(true);
         })
         .catch((err) => {
           console.error('Failed to load task:', err);
@@ -41,7 +41,7 @@ const TaskPage = ({ taskId = null }) => {
       .then((res) => {
         alert('Task created! Now set the location.');
         setTaskCreated(true);
-        setTask(res.data); // save task ID if returned
+        setTask(res.data);
       })
       .catch(() => alert('Failed to create task'));
   };
@@ -60,106 +60,118 @@ const TaskPage = ({ taskId = null }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 py-10">
-      <div className="max-w-4xl mx-auto px-4 mt-10">
-        <div className="bg-white shadow-2xl rounded-2xl p-8 space-y-6">
-           <ShowNotice />
-          <h1 className="text-3xl font-bold mb-6 text-center text-blue-900">
-            {isEditing ? 'Edit Task' : taskCreated ? 'Task Created - Set Location' : 'Create New Task'}
-          </h1>
+   <div
+      className="min-h-screen bg-cover bg-center bg-fixed relative"
+      style={{ 
+       backgroundImage: "url('https://images.unsplash.com/photo-1600494603989-9650cf6ddd3d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80')",
+      }}
+    >
+      {/* Semi-transparent overlay */}
+      <div className="absolute inset-0 bg-gray-900/60"></div>
+      
+      <div className="relative z-10 py-10">
+        <div className="max-w-6xl mx-auto px-4 mt-10">
+          <div className="bg-white/90 backdrop-blur-sm shadow-2xl rounded-2xl p-8 space-y-6">
+            <ShowNotice />
+            <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+              {isEditing ? 'Edit Task' : taskCreated ? 'Task Created - Set Location' : 'Create New Task'}
+            </h1>
 
-          {/* Form Fields */}
-          <input
-            name="title"
-            placeholder="Title"
-            value={task.title}
-            onChange={handleChange}
-            disabled={taskCreated && !isEditing}
-            className="border p-3 rounded w-full"
-          />
-          <input
-            name="description"
-            placeholder="Description"
-            value={task.description}
-            onChange={handleChange}
-            disabled={taskCreated && !isEditing}
-            className="border p-3 rounded w-full"
-          />
-          <input
-            name="requiredSkills"
-            placeholder="Required Skills"
-            value={task.requiredSkills}
-            onChange={handleChange}
-            disabled={taskCreated && !isEditing}
-            className="border p-3 rounded w-full"
-          />
-          <input
-            type="number"
-            step="0.01"
-            name="allocatedAmount"
-            placeholder="Allocated Amount"
-            value={task.allocatedAmount}
-            onChange={handleChange}
-            disabled={taskCreated && !isEditing}
-            className="border p-3 rounded w-full"
-          />
-          <input
-            type="number"
-            name="allocatedTime"
-            placeholder="Task Duration (Hours)"
-            value={task.allocatedTime}
-            onChange={handleChange}
-            disabled={taskCreated && !isEditing}
-            className="border p-3 rounded w-full"
-          />
+            {/* Form Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <input
+                name="title"
+                placeholder="Title"
+                value={task.title}
+                onChange={handleChange}
+                disabled={taskCreated && !isEditing}
+                className="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+              <input
+                name="requiredSkills"
+                placeholder="Required Skills"
+                value={task.requiredSkills}
+                onChange={handleChange}
+                disabled={taskCreated && !isEditing}
+                className="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+              <input
+                name="description"
+                placeholder="Description"
+                value={task.description}
+                onChange={handleChange}
+                disabled={taskCreated && !isEditing}
+                className="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none md:col-span-2"
+              />
+              <input
+                type="number"
+                step="0.01"
+                name="allocatedAmount"
+                placeholder="Allocated Amount"
+                value={task.allocatedAmount}
+                onChange={handleChange}
+                disabled={taskCreated && !isEditing}
+                className="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+              <input
+                type="number"
+                name="allocatedTime"
+                placeholder="Task Duration (Hours)"
+                value={task.allocatedTime}
+                onChange={handleChange}
+                disabled={taskCreated && !isEditing}
+                className="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+              <div className="md:col-span-2">
+                <label htmlFor="scheduledDate" className="block font-semibold mb-2 text-gray-700">Schedule Date and Time</label>
+                <input
+                  type="datetime-local"
+                  id="scheduledDate"
+                  name="scheduledDate"
+                  value={task.scheduledDate}
+                  onChange={handleChange}
+                  disabled={taskCreated && !isEditing}
+                  className="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+            </div>
 
-          <div>
-            <label htmlFor="scheduledDate" className="block font-semibold mb-1">Schedule Date and Time</label>
-            <input
-              type="datetime-local"
-              id="scheduledDate"
-              name="scheduledDate"
-              value={task.scheduledDate}
-              onChange={handleChange}
-              disabled={taskCreated && !isEditing}
-              className="border p-3 rounded w-full"
-            />
+            {/* Action Button */}
+            {!taskCreated && !isEditing && (
+              <div className="text-center">
+                <button
+                  onClick={handleCreate}
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-8 py-3 rounded-lg mt-6 shadow-lg hover:shadow-xl transition-all"
+                >
+                  Create Task
+                </button>
+              </div>
+            )}
+
+            {isEditing && (
+              <div className="text-center">
+                <button
+                  onClick={handleUpdate}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-8 py-3 rounded-lg mt-6 shadow-lg hover:shadow-xl transition-all"
+                >
+                  Update Task
+                </button>
+              </div>
+            )}
+
+            {/* Location Section */}
+            {taskCreated && (
+              <div className="mt-8">
+                <TaskLocation taskId={task.id} onLocationSaved={handleLocationSaved} />
+              </div>
+            )}
+
+            {locationSaved && (
+              <div className="text-center p-4 bg-green-100 text-green-800 rounded-lg font-semibold">
+                ✅ Task location saved successfully!
+              </div>
+            )}
           </div>
-
-          {/* Action Button */}
-          {!taskCreated && !isEditing && (
-            <div className="text-center">
-              <button
-                onClick={handleCreate}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg mt-4"
-              >
-                Create Task
-              </button>
-            </div>
-          )}
-
-          {isEditing && (
-            <div className="text-center">
-              <button
-                onClick={handleUpdate}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg mt-4"
-              >
-                Update Task
-              </button>
-            </div>
-          )}
-
-          {/* Location Section */}
-          {taskCreated && (
-            <div className="mt-8">
-              <TaskLocation taskId={task.id} onLocationSaved={handleLocationSaved} />
-            </div>
-          )}
-
-          {locationSaved && (
-            <div className="text-green-700 text-center font-semibold">✅ Task location saved successfully!</div>
-          )}
-
         </div>
       </div>
     </div>

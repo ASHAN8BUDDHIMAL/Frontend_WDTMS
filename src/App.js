@@ -8,6 +8,7 @@ import Home from "./Pages/Home";
 import About from "./Pages/About";
 import Services from "./Pages/Services";
 import HelpCenter from "./Pages/HelpCenter";
+import TermsAndConditions from "./Pages/TermsAndConditions";
 import Registration from "./Pages/Registration";
 import Login from "./Pages/Login";
 
@@ -20,15 +21,13 @@ import Newtasks from "./Pages/Newtasks";
 import ViewProfile from "./Pages/ViewProfile";
 
 import ManageUsers from "./Pages/ManageUsers";
-import ManageTasks from "./Pages/HelpCenter";
 import AdminReport from "./Pages/AdminReport";
-import Settings from "./Pages/Settings";
+import AdminTermsConditions from "./Pages/AdminTermsConditions";
 import Notice from "./Pages/Notice";
 
 import WorkerTasksAssigned from "./Pages/WorkerTasksAssigned";
 import WorkerChat from "./Pages/WorkerChat";
 import WorkerProfile from "./Pages/WorkerProfile";
-import WorkerCompletedTasks from "./Pages/WorkerCompletedTasks";
 import AvailabilityCalendar from "./Pages/AvailabilityCalendar";
 import ReviewRating from "./Pages/ReviewRating";
 import WorkerReport from "./Pages/WorkerReport";
@@ -43,6 +42,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
           <Route path="/help" element={<HelpCenter />} />
+          <Route path="/view-terms" element={<TermsAndConditions />} />
           <Route path="/registration" element={<Registration />} />
           <Route path="/login" element={<Login />} />
         </Route>
@@ -64,12 +64,11 @@ function App() {
           <Route path="/admin/notice" element={<Notice />} />
           <Route path="/admin/manage-users" element={<ManageUsers />} />
           <Route path="/admin/admin-report" element={<AdminReport />} />
-          <Route path="/admin/settings" element={<Settings />} />
+          <Route path="/admin/terms" element={<AdminTermsConditions />} />
         </Route>
 
         <Route element={<WorkerLayout />}>
          <Route path="/worker/tasks-assigned" element={<WorkerTasksAssigned />} />
-         <Route path="/worker/completed-tasks" element={<WorkerCompletedTasks />} />
          <Route path="/worker/worker-chat" element={<WorkerChat />} />
          <Route path="/worker/worker-profile" element={<WorkerProfile />} />
          <Route path="/worker/availability-calendar" element={<AvailabilityCalendar />} />

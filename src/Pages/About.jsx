@@ -5,8 +5,8 @@ const About = () => {
   const [activeTab, setActiveTab] = useState("mission");
 
   const stats = [
-    { value: "10,000+", label: "Tasks Completed" },
-    { value: "2,500+", label: "Trusted Workers" },
+    { value: "10,00+", label: "Tasks Completed" },
+    { value: "2,50+", label: "Trusted Workers" },
     { value: "95%", label: "Satisfaction Rate" },
   ];
 
@@ -105,7 +105,7 @@ const About = () => {
               <h2 className="text-3xl font-bold text-gray-900 mb-6">From Frustration to Solution</h2>
               <div className="space-y-6">
                 <p className="text-lg text-gray-700">
-                  Founded in 2022 after our CEO struggled to find reliable help for simple home tasks, we set out to
+                  Founded in 2025 after our CEO struggled to find reliable help for simple home tasks, we set out to
                   create a better way. What started as a local bulletin board is now a thriving platform serving
                   communities across the country.
                 </p>

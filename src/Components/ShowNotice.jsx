@@ -49,7 +49,7 @@ const NoticeViewer = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <div className="max-w-6xl mx-auto px-4 py-6">
       <div className="space-y-6">
         {notices.map((notice) => (
           <div key={notice.id} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
